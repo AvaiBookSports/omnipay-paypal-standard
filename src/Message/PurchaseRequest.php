@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\PaypalStandard\Message;
+namespace Omnipay\PayPalStandard\Message;
 
 /**
  * Purchase Request

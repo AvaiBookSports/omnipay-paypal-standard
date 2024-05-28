@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\PaypalStandard\Message;
+namespace Omnipay\PayPalStandard\Message;
 
 use Omnipay\Common\Exception\InvalidRequestException;
 
@@ -9,72 +9,15 @@ use Omnipay\Common\Exception\InvalidRequestException;
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
+    /**
+     * @throws InvalidRequestException
+     */
     public function getData()
     {
         foreach ($this->getRequiredCoreFields() as $field) {
             $this->validate($field);
         }
-        $this->validateCardFields();
-        return $this->getBaseData() + $this->getTransactionData();
-    }
-
-    public function validateCardFields()
-    {
-        $card = $this->getCard();
-        foreach ($this->getRequiredCardFields() as $field) {
-            $fn = 'get' . ucfirst($field);
-            $result = $card->$fn();
-            if (empty($result)) {
-                throw new InvalidRequestException("The $field parameter is required");
-            }
-        }
-    }
-
-  /**
-   * Generate a signature using a secret key.
-   *
-   * @param array $data
-   * @return string
-   */
-  public function generateSignature($data)
-  {
-    $msg = array();
-    foreach ($data as $key => $value) {
-      $msg[] = "{$key}={$value}";
-    }
-    // If the key is in ASCII format, convert it to binary
-    $binKey = pack("H*", $this->getKey());
-    return strtoupper(hash_hmac('sha512', implode('&', $msg), $binKey));
-  }
-
-  public function getUsername()
-    {
-        return $this->getParameter('username');
-    }
-
-    public function setUsername($value)
-    {
-        return $this->setParameter('username', $value);
-    }
-
-  public function getSite()
-  {
-    return $this->getParameter('site');
-  }
-
-  public function setSite($value)
-  {
-    return $this->setParameter('site', $value);
-  }
-
-  public function getPassword()
-    {
-        return $this->getParameter('password');
-    }
-
-    public function setPassword($value)
-    {
-        return $this->setParameter('password', $value);
+        return array_merge($this->getBaseData(), $this->getTransactionData());
     }
 
     public function getTransactionType()
@@ -87,19 +30,83 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('transactionType', $value);
     }
 
-  public function getMerchantAccountEmail()
-  {
-    return $this->getParameter('MerchantAccountEmail');
-  }
+    public function getBusinessEmail()
+    {
+        return $this->getParameter('businessEmail');
+    }
 
-  public function setMerchantAccountEmail($value)
-  {
-    return $this->setParameter('MerchantAccountEmail', $value);
-  }
+    public function setBusinessEmail($value)
+    {
+        return $this->setParameter('businessEmail', $value);
+    }
 
-  public function getRequiredFields()
-  {
-    return array_merge($this->getRequiredCardFields(), $this->getRequiredCardFields());
-  }
+    public function getCmd()
+    {
+        return $this->getParameter('cmd');
+    }
 
+    public function setCmd($value)
+    {
+        return $this->setParameter('cmd', $value);
+    }
+
+    public function getReturnMethod()
+    {
+        return $this->getParameter('rm');
+    }
+
+    public function setReturnMethod($value)
+    {
+        return $this->setParameter('rm', $value);
+    }
+
+    public function getNoShipping()
+    {
+        return $this->getParameter('no_shipping');
+    }
+
+    public function setNoShipping($value)
+    {
+        return $this->setParameter('no_shipping', $value);
+    }
+
+    public function getReturnMerchantButtonText()
+    {
+        return $this->getParameter('cbt');
+    }
+
+    public function setReturnMerchantButtonText($value)
+    {
+        return $this->setParameter('cbt', $value);
+    }
+
+    public function getPrivateOrderId()
+    {
+        return $this->getParameter('item_number');
+    }
+
+    public function setPrivateOrderId($value)
+    {
+        return $this->setParameter('item_number', $value);
+    }
+
+    public function getLocale()
+    {
+        return $this->getParameter('lc');
+    }
+
+    public function setLocale($value)
+    {
+        return $this->setParameter('lc', $value);
+    }
+
+    public function getCustomData()
+    {
+        return $this->getParameter('custom');
+    }
+
+    public function setCustomData($value)
+    {
+        return $this->setParameter('custom', $value);
+    }
 }

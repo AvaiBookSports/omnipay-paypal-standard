@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\PaypalStandard\Message;
+namespace Omnipay\PayPalStandard\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RequestInterface;
@@ -11,34 +11,13 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class Response extends AbstractResponse implements RedirectResponseInterface
 {
-    /**
-     * endpoint is the remote url - should be provided by the processor.
-     *
-     * @var string
-     */
-    protected $testEndpoint = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
-    protected $liveEndpoint = 'https://www.paypal.com/cgi-bin/webscr';
+    protected string $testEndpoint = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 
-    /**
-     * Get end point.
-     *
-     * @return string
-     */
-    public function getEndpoint()
-    {
-        return $this->getRequest()
-            ->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
-    }
+    protected string $liveEndpoint = 'https://www.paypal.com/cgi-bin/webscr';
 
-    /**
-     * Set end point.
-     *
-     * @param string $endpoint
-     *   Set URL to redirect to.
-     */
-    public function setEndpoint($endpoint)
+    public function getEndpoint(): string
     {
-        $this->endpoint = $endpoint;
+        return $this->getRequest()->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
     }
 
     public function __construct(RequestInterface $request, $data)
@@ -81,7 +60,7 @@ class Response extends AbstractResponse implements RedirectResponseInterface
 
     public function getRedirectUrl()
     {
-        return $this->getEndpoint() . '?' . http_build_query($this->data) . '&bn=CiviCRM_SP' . '&cmd=_xclick';
+        return $this->getEndpoint() . '?' . http_build_query($this->data);
     }
 
     /**
@@ -90,7 +69,7 @@ class Response extends AbstractResponse implements RedirectResponseInterface
      */
     public function getRedirectMethod()
     {
-        return 'GET';
+        return 'GET'; // POST?
     }
 
     public function getRedirectData()

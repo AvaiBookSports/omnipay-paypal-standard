@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\PaypalStandard\Message;
+namespace Omnipay\PayPalStandard\Message;
 
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
@@ -10,17 +10,13 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 class AuthorizeRequest extends AbstractRequest
 {
-
     public function getData()
     {
         foreach ($this->getRequiredCoreFields() as $field) {
             $this->validate($field);
         }
-        $this->validateCardFields();
-        $data = $this->getBaseData() + $this->getTransactionData() + $this->getURLData();
-        return $data;
+        return array_merge($this->getBaseData(), $this->getTransactionData(), $this->getURLData());
     }
-
 
     /**
      * sendData function. In this case, where the browser is to be directly it constructs and returns a response object
@@ -37,115 +33,80 @@ class AuthorizeRequest extends AbstractRequest
         return $this->response = new AuthorizeResponse($this, $data);
     }
 
-    public function getSite()
+    public function getBusinessEmail()
     {
-        return $this->getParameter('site');
+        return $this->getParameter('businessEmail');
     }
 
-    public function setSite($value)
+    public function setBusinessEmail($value)
     {
-        return $this->setParameter('site', $value);
-    }
-
-    public function getMerchantAccountEmail()
-    {
-        return $this->getParameter('MerchantAccountEmail');
-    }
-
-    public function setMerchantAccountEmail($value)
-    {
-        return $this->setParameter('MerchantAccountEmail', $value);
+        return $this->setParameter('businessEmail', $value);
     }
 
     /**
      * Get an array of the required fields for the core gateway
-     * @return array
      */
-    public function getRequiredCoreFields()
+    public function getRequiredCoreFields(): array
     {
-        return array
-        (
+        return [
             'amount',
-            'currency',
-        );
-    }
-
-    /**
-     * get an array of the required 'card' fields (personal information fields)
-     * @return array
-     */
-    public function getRequiredCardFields()
-    {
-        return array
-        (
-            'email',
-        );
+            'currency'
+        ];
     }
 
     /**
      * Get values for IPN and browser return urls.
      *
      * Browser return urls should all be set or non set.
-     *
-     * https://developer.paypal.com/docs/classic/ipn/integration-guide/IPNandPDTVariables/
      */
-    public function getURLData()
+    public function getURLData(): array
     {
-        $data = array();
-        $data['ipn_notification_url'] = urlencode($this->getNotifyUrl());
-        $data['return_url'] = $this->getReturnUrl();
-        $data['cancel_return'] = $this->getCancelUrl();
-        return $data;
+        return [
+            'notify_url' => $this->getNotifyUrl(),
+            'return' => $this->getReturnUrl(),
+            'cancel_return' => $this->getCancelUrl()
+        ];
     }
 
     /**
-     * @return string
-     */
-    public function getUniqueID()
-    {
-        return uniqid();
-    }
-
-    /**
-     * Map Omnipay normalised fields to gateway defined fields. If the order the fields are
+     * Map Omnipay normalised fields to gateway defined fields. If the order fields are
      * passed to the gateway matters you should order them correctly here
      *
-     * @return array
+     * https://developer.paypal.com/api/nvp-soap/paypal-payments-standard/integration-guide/Appx-websitestandard-htmlvariables/
+     *
      * @throws InvalidRequestException
      */
-
-    public function getTransactionData()
+    public function getTransactionData(): array
     {
-        return array
-        (
+        return [
             'amount' => $this->getAmount(),
             'currency_code' => $this->getCurrency(),
-            'email' => $this->getCard()->getEmail(),
             'transaction_id' => $this->getTransactionId(),
             'item_name' => $this->getDescription(),
-        );
+            'item_number' => $this->getPrivateOrderId(),
+            'cmd' => $this->getCmd(),
+            'no_note' => '1', // Do not prompt buyers to include a note with their payments
+            'no_shipping' => $this->getNoShipping(),
+            'rm' => $this->getReturnMethod(),
+            'lc' => $this->getLocale(),
+            'custom' => $this->getCustomData(),
+            'cbt' => $this->getReturnMerchantButtonText(),
+        ];
     }
 
     /**
      * @return array
-     * Get data that is common to all requests - generally aut
+     * Get data that is common to all requests
      */
-    public function getBaseData()
+    public function getBaseData(): array
     {
-        return array(
-            'business' => $this->getMerchantAccountEmail(),
-        );
+        return [
+            'business' => $this->getBusinessEmail(),
+        ];
     }
 
     public function getTransactionType()
     {
         return 'Authorize';
-    }
-
-    public function getPaymentMethod()
-    {
-        // ???
-        // return 'card';
-        // return $this->getParameter('paymentMethod');
     }
 }

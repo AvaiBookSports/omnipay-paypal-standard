@@ -19,10 +19,10 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Omnipay\\PaypalStandard\\" : "src/" }
+        "psr-4": { "Omnipay\\PayPalStandard\\" : "src/" }
     },
     "autoload-dev": {
-        "psr-4": { "Omnipay\\PaypalStandard\\" : "tests/" }
+        "psr-4": { "Omnipay\\PayPalStandard\\" : "tests/" }
     },
     "require": {
         "php": "^7.4|^8",

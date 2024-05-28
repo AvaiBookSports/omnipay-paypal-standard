@@ -1,8 +1,6 @@
 <?php
 
-namespace Omnipay\PaypalStandard\Message;
-
-use Omnipay\Common\Exception\InvalidRequestException;
+namespace Omnipay\PayPalStandard\Message;
 
 /**
  * Sample Complete Authorize Response
@@ -21,11 +19,6 @@ class CompleteAuthorizeRequest extends AbstractRequest
 
     public function getData()
     {
-        // TODO: Check $this->getToken()
-        if (strtolower($this->httpRequest->request->get('x_MD5_Hash')) !== $this->getToken()) {
-            throw new InvalidRequestException('Incorrect hash');
-        }
-
-        return $this->httpRequest->request->all();
+        return array_merge($this->httpRequest->query->all(), $this->httpRequest->request->all());
     }
 }
