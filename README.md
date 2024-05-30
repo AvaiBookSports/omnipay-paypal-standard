@@ -7,10 +7,7 @@ processing library for PHP. This package implements common classes required by O
 
 ## Basic Usage
 
-The following gateway are provided by this package:
-- PayPal_Standard
-
-PayPal_Standard allows to process payments only with the email of a PayPal account. This is not secure, so we strongly discourage their use.
+The `PayPalStandard` gateway are provided by this package, it allows to process payments only with the business email of a PayPal account. This is not secure, so we strongly discourage their use.
 
 ## Support
 
