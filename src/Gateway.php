@@ -17,8 +17,10 @@ class Gateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return [
-            'businessEmail' => '',
+            'business' => '',
+            'no_note' => 1,
             'testMode' => false,
+            'noVerifyIpn' => false,
         ];
     }
 
@@ -71,14 +73,61 @@ class Gateway extends AbstractGateway
         return $this->createRequest(Message\CompleteAuthorizeRequest::class, $parameters);
     }
 
-    public function getBusinessEmail()
+    public function getNoVerifyIpn(): bool
     {
-        return $this->getParameter('businessEmail');
+        return $this->getParameter('noVerifyIpn');
     }
 
-    public function setBusinessEmail($value)
+    public function setNoVerifyIpn(bool $value)
     {
-        return $this->setParameter('businessEmail', $value);
+        return $this->setParameter('noVerifyIpn', $value);
+    }
+
+    public function getBusiness()
+    {
+        return $this->getParameter('business');
+    }
+
+    public function setBusiness($value)
+    {
+        return $this->setParameter('business', $value);
+    }
+
+    public function getAmount()
+    {
+        return $this->getParameter('amount');
+    }
+
+    public function setAmount($value)
+    {
+        return $this->setParameter('amount', $value);
+    }
+
+    public function getRM()
+    {
+        return $this->getParameter('rm');
+    }
+
+    /**
+     * @param int $returnMethod
+     * 0 -> GET
+     * 1 -> GET but no payment variables are included
+     * 2 -> POST and all payment variables are included
+     * @return Gateway
+     */
+    public function setRM($value)
+    {
+        return $this->setParameter('rm', $value);
+    }
+
+    public function getCbt()
+    {
+        return $this->getParameter('cbt');
+    }
+
+    public function setCbt($value)
+    {
+        return $this->setParameter('cbt', $value);
     }
 
     public function getCmd()
@@ -101,23 +150,6 @@ class Gateway extends AbstractGateway
         return $this->setParameter('cmd', $cmd);
     }
 
-    public function getReturnMethod()
-    {
-        return $this->getParameter('rm');
-    }
-
-    /**
-     * @param int $returnMethod
-     * 0 -> GET
-     * 1 -> GET but no payment variables are included
-     * 2 -> POST and all payment variables are included
-     * @return Gateway
-     */
-    public function setReturnMethod(int $returnMethod)
-    {
-        return $this->setParameter('rm', $returnMethod);
-    }
-
     public function getNoShipping()
     {
         return $this->getParameter('no_shipping');
@@ -135,37 +167,37 @@ class Gateway extends AbstractGateway
         return $this->setParameter('no_shipping', $noShipping);
     }
 
-    public function getReturnMerchantButtonText()
-    {
-        return $this->getParameter('cbt');
-    }
-
-    public function setReturnMerchantButtonText(string $returnMerchantButtonText)
-    {
-        return $this->setParameter('cbt', $returnMerchantButtonText);
-    }
-
-    public function getPrivateOrderId()
+    public function getItemNumber()
     {
         return $this->getParameter('item_number');
     }
 
-    public function setPrivateOrderId(string $privateOrderId)
+    public function setItemNumber(string $itemNumber)
     {
-        return $this->setParameter('item_number', $privateOrderId);
+        return $this->setParameter('item_number', $itemNumber);
     }
 
-    public function getLocale()
+    public function getItemName()
+    {
+        return $this->getParameter('item_name');
+    }
+
+    public function setItemName(string $itemName)
+    {
+        return $this->setParameter('item_name', $itemName);
+    }
+
+    public function getLc()
     {
         return $this->getParameter('lc');
     }
 
-    public function setLocale(string $locale)
+    public function setLc(string $locale)
     {
         return $this->setParameter('lc', $locale);
     }
 
-    public function getCustomData()
+    public function getCustom()
     {
         return $this->getParameter('custom');
     }
@@ -175,8 +207,38 @@ class Gateway extends AbstractGateway
      * @param string $customData
      * @return Gateway
      */
-    public function setCustomData(string $customData)
+    public function setCustom(string $customData)
     {
         return $this->setParameter('custom', $customData);
+    }
+
+    public function getNotifyUrl()
+    {
+        return $this->getParameter('notify_url');
+    }
+
+    public function setNotifyUrl(string $value)
+    {
+        return $this->setParameter('notify_url', $value);
+    }
+
+    public function getCancelReturn()
+    {
+        return $this->getParameter('cancel_return');
+    }
+
+    public function setCancelReturn(string $value)
+    {
+        return $this->setParameter('cancel_return', $value);
+    }
+
+    public function getReturn()
+    {
+        return $this->getParameter('return');
+    }
+
+    public function setReturn(string $value)
+    {
+        return $this->setParameter('return', $value);
     }
 }

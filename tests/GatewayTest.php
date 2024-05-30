@@ -16,7 +16,7 @@ final class GatewayTest extends GatewayTestCase
         parent::setUp();
 
         $this->standardGateway = new Gateway($this->getHttpClient(), $this->getHttpRequest());
-        $this->standardGateway->setBusinessEmail('testing@testing.test');
+        $this->standardGateway->setBusiness('testing@testing.test');
     }
 
     /**
@@ -54,7 +54,7 @@ final class GatewayTest extends GatewayTestCase
     public function it_should_assert_each_case(string $amount, string $currency, string $function): void
     {
         $gateway = new gateway($this->getHttpClient(), $this->getHttpRequest());
-        $gateway->setBusinessEmail('testing@testing.test');
+        $gateway->setBusiness('testing@testing.test');
 
         $response = $gateway->$function(['amount' => $amount, 'currency' => $currency])->send();
 

@@ -33,16 +33,6 @@ class AuthorizeRequest extends AbstractRequest
         return $this->response = new AuthorizeResponse($this, $data);
     }
 
-    public function getBusinessEmail()
-    {
-        return $this->getParameter('businessEmail');
-    }
-
-    public function setBusinessEmail($value)
-    {
-        return $this->setParameter('businessEmail', $value);
-    }
-
     /**
      * Get an array of the required fields for the core gateway
      */
@@ -63,8 +53,8 @@ class AuthorizeRequest extends AbstractRequest
     {
         return [
             'notify_url' => $this->getNotifyUrl(),
-            'return' => $this->getReturnUrl(),
-            'cancel_return' => $this->getCancelUrl()
+            'return' => $this->getReturn(),
+            'cancel_return' => $this->getCancelReturn()
         ];
     }
 
@@ -72,8 +62,8 @@ class AuthorizeRequest extends AbstractRequest
      * Map Omnipay normalised fields to gateway defined fields. If the order fields are
      * passed to the gateway matters you should order them correctly here
      *
-     * https://developer.paypal.com/api/nvp-soap/paypal-payments-standard/integration-guide/Appx-websitestandard-htmlvariables/
-     *
+     * 
+     *https://developer.paypal.com/api/nvp-soap/paypal-payments-standard/integration-guide/Appx-websitestandard-htmlvariables/
      * @throws InvalidRequestException
      */
     public function getTransactionData(): array
@@ -82,15 +72,15 @@ class AuthorizeRequest extends AbstractRequest
             'amount' => $this->getAmount(),
             'currency_code' => $this->getCurrency(),
             'transaction_id' => $this->getTransactionId(),
-            'item_name' => $this->getDescription(),
-            'item_number' => $this->getPrivateOrderId(),
+            'item_name' => $this->getItemName(),
+            'item_number' => $this->getItemNumber(),
             'cmd' => $this->getCmd(),
-            'no_note' => '1', // Do not prompt buyers to include a note with their payments
+            'no_note' => $this->getNoNote(), // Do not prompt buyers to include a note with their payments
             'no_shipping' => $this->getNoShipping(),
-            'rm' => $this->getReturnMethod(),
-            'lc' => $this->getLocale(),
-            'custom' => $this->getCustomData(),
-            'cbt' => $this->getReturnMerchantButtonText(),
+            'rm' => $this->getRM(),
+            'lc' => $this->getLc(),
+            'custom' => $this->getCustom(),
+            'cbt' => $this->getCbt(),
         ];
     }
 
@@ -101,7 +91,7 @@ class AuthorizeRequest extends AbstractRequest
     public function getBaseData(): array
     {
         return [
-            'business' => $this->getBusinessEmail(),
+            'business' => $this->getBusiness(),
         ];
     }
 
