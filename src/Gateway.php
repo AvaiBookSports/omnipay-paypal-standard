@@ -109,13 +109,12 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param int $returnMethod
+     * @param int $value
      * 0 -> GET
      * 1 -> GET but no payment variables are included
      * 2 -> POST and all payment variables are included
-     * @return Gateway
      */
-    public function setRM($value)
+    public function setRM(int $value)
     {
         return $this->setParameter('rm', $value);
     }
@@ -136,18 +135,17 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param string $cmd
+     * @param string $value
      * _xclick
      * _cart
      * _xclick-subscriptions
      * _xclick-auto-billing
      * _donations
      * _s-xclick
-     * @return Gateway
      */
-    public function setCmd(string $cmd)
+    public function setCmd(string $value)
     {
-        return $this->setParameter('cmd', $cmd);
+        return $this->setParameter('cmd', $value);
     }
 
     public function getNoShipping()
@@ -156,15 +154,14 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param int $noShipping
+     * @param int $value
      * 0 -> Prompt for an address, but do not require one
      * 1 -> Do not prompt for an address
      * 2 -> Prompt for an address and require one
-     * @return Gateway
      */
-    public function setNoShipping(int $noShipping)
+    public function setNoShipping(int $value)
     {
-        return $this->setParameter('no_shipping', $noShipping);
+        return $this->setParameter('no_shipping', $value);
     }
 
     public function getItemNumber()
@@ -172,9 +169,9 @@ class Gateway extends AbstractGateway
         return $this->getParameter('item_number');
     }
 
-    public function setItemNumber(string $itemNumber)
+    public function setItemNumber(string $value)
     {
-        return $this->setParameter('item_number', $itemNumber);
+        return $this->setParameter('item_number', $value);
     }
 
     public function getItemName()
@@ -182,9 +179,9 @@ class Gateway extends AbstractGateway
         return $this->getParameter('item_name');
     }
 
-    public function setItemName(string $itemName)
+    public function setItemName(string $value)
     {
-        return $this->setParameter('item_name', $itemName);
+        return $this->setParameter('item_name', $value);
     }
 
     public function getLc()
@@ -192,9 +189,9 @@ class Gateway extends AbstractGateway
         return $this->getParameter('lc');
     }
 
-    public function setLc(string $locale)
+    public function setLc(string $value)
     {
-        return $this->setParameter('lc', $locale);
+        return $this->setParameter('lc', $value);
     }
 
     public function getCustom()
@@ -204,12 +201,11 @@ class Gateway extends AbstractGateway
 
     /**
      * Pass-through variable for your own tracking purposes, which buyers do not see
-     * @param string $customData
-     * @return Gateway
+     * @param string $value
      */
-    public function setCustom(string $customData)
+    public function setCustom(string $value)
     {
-        return $this->setParameter('custom', $customData);
+        return $this->setParameter('custom', $value);
     }
 
     public function getNotifyUrl()
