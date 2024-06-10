@@ -113,4 +113,9 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
             return false;
         }
     }
+
+    public function getTransactionReference()
+    {
+        return $this->data['payer_id'];
+    }
 }
