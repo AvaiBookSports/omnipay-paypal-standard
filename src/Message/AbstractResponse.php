@@ -102,6 +102,20 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
         }
     }
 
+    public function isCancelled()
+    {
+        if (
+            empty($this->data)
+            || empty($this->data['payment_status'])
+            || 'Completed' !== $this->data['payment_status']
+            || !count($_POST)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getTransactionReference()
     {
         return $this->data['payer_id'];
