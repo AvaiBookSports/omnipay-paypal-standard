@@ -62,16 +62,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('business', $value);
     }
 
-    public function getNoVerifyIpn()
-    {
-        return $this->getParameter('noVerifyIpn');
-    }
-
-    public function setNoVerifyIpn($value)
-    {
-        return $this->setParameter('noVerifyIpn', $value);
-    }
-
     public function getRM()
     {
         return $this->getParameter('rm');

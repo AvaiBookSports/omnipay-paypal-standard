@@ -20,7 +20,6 @@ class Gateway extends AbstractGateway
             'business' => '',
             'no_note' => 1,
             'testMode' => false,
-            'noVerifyIpn' => false,
         ];
     }
 
@@ -71,16 +70,6 @@ class Gateway extends AbstractGateway
     public function completeAuthorize(array $parameters = array())
     {
         return $this->createRequest(Message\CompleteAuthorizeRequest::class, $parameters);
-    }
-
-    public function getNoVerifyIpn(): bool
-    {
-        return $this->getParameter('noVerifyIpn');
-    }
-
-    public function setNoVerifyIpn(bool $value)
-    {
-        return $this->setParameter('noVerifyIpn', $value);
     }
 
     public function getBusiness()

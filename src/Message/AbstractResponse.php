@@ -18,11 +18,6 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
         return $this->request->getParameters()['testMode'];
     }
 
-    protected function noVerifyIpn(): bool
-    {
-        return $this->request->getParameters()['noVerifyIpn'];
-    }
-
     protected function getIpnUrl(): string
     {
         if ($this->isTestMode()) {
@@ -80,24 +75,24 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
             'User-Agent: PHP-IPN-Verification-Script',
             'Connection: Close',
         ]);
+
         $res = curl_exec($ch);
+
         if (!$res) {
             $errno = curl_errno($ch);
             $errstr = curl_error($ch);
             curl_close($ch);
             throw new Exception("cURL error: [$errno] $errstr");
         }
+
         $info = curl_getinfo($ch);
         $http_code = $info['http_code'];
+
         if (200 != $http_code) {
             throw new Exception("PayPal responded with http code $http_code");
         }
-        curl_close($ch);
 
-        // TODO: Apparently in test mode always returns INVALID
-        if ($this->isTestMode() || $this->noVerifyIpn()) {
-            return true;
-        }
+        curl_close($ch);
 
         // Check if PayPal verifies the IPN data, and if so, return true.
         if ($res == 'VERIFIED') {
