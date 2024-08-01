@@ -15,6 +15,8 @@ class CompletePurchaseRequest extends AbstractRequest
 
     public function getData()
     {
-        return array_merge($this->httpRequest->query->all(), $this->httpRequest->request->all());
+        $data = parent::getData();
+
+        return array_merge($data, $this->httpRequest->query->all(), $this->httpRequest->request->all());
     }
 }

@@ -10,24 +10,31 @@ use Omnipay\Common\Exception\InvalidRequestException;
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
     /**
+     * Map Omnipay normalised fields to gateway defined fields. If the order fields are
+     * passed to the gateway matters you should order them correctly here
+     *
+     *
+     * https://developer.paypal.com/api/nvp-soap/paypal-payments-standard/integration-guide/Appx-websitestandard-htmlvariables/
      * @throws InvalidRequestException
      */
     public function getData()
     {
-        foreach ($this->getRequiredCoreFields() as $field) {
-            $this->validate($field);
-        }
-        return array_merge($this->getBaseData(), $this->getTransactionData());
-    }
+        $this->validate('amount', 'currency');
 
-    public function getTransactionType()
-    {
-        return $this->getParameter('transactionType');
-    }
-
-    public function setTransactionType($value)
-    {
-        return $this->setParameter('transactionType', $value);
+        return [
+            'amount' => $this->getAmount(),
+            'currency_code' => $this->getCurrency(),
+            'transaction_id' => $this->getTransactionId(),
+            'item_name' => $this->getItemName(),
+            'item_number' => $this->getItemNumber(),
+            'cmd' => $this->getCmd(),
+            'no_note' => $this->getNoNote(), // Do not prompt buyers to include a note with their payments
+            'no_shipping' => $this->getNoShipping(),
+            'rm' => $this->getRM(),
+            'lc' => $this->getLc(),
+            'custom' => $this->getCustom(),
+            'cbt' => $this->getCbt(),
+        ];
     }
 
     public function getTransactionId()
@@ -53,6 +60,16 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     public function setBusiness($value)
     {
         return $this->setParameter('business', $value);
+    }
+
+    public function getNoVerifyIpn()
+    {
+        return $this->getParameter('noVerifyIpn');
+    }
+
+    public function setNoVerifyIpn($value)
+    {
+        return $this->setParameter('noVerifyIpn', $value);
     }
 
     public function getRM()

@@ -7,8 +7,4 @@ namespace Omnipay\PayPalStandard\Message;
  */
 class PurchaseRequest extends AuthorizeRequest
 {
-    public function getTransactionType()
-    {
-        return 'sale';
-    }
 }
