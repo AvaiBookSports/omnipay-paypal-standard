@@ -11,10 +11,13 @@ class CaptureRequest extends AuthorizeRequest
 {
     public function getData()
     {
+        $data = parent::getData();
+
         foreach ($this->getRequiredCoreFields() as $field) {
             $this->validate($field);
         }
-        return array_merge($this->httpRequest->query->all(), $this->httpRequest->request->all());
+
+        return array_merge($data, $this->httpRequest->query->all(), $this->httpRequest->request->all());
     }
 
     /**
@@ -49,10 +52,5 @@ class CaptureRequest extends AuthorizeRequest
             'business' => $this->getBusiness(),
             'payer_id' => $this->getTransactionReference(),
         ];
-    }
-
-    public function getTransactionType()
-    {
-        return 'capture';
     }
 }
