@@ -69,7 +69,7 @@ class Response extends AbstractResponse implements RedirectResponseInterface
      */
     public function getRedirectMethod()
     {
-        return 'GET'; // POST?
+        return 'GET';
     }
 
     public function getRedirectData()

@@ -6,9 +6,6 @@ namespace Omnipay\PayPalStandard\Message;
 
 abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
 {
-    /**
-     * https://www.youtube.com/watch?v=dQw4w9WgXcQ
-     */
     private const SANDBOX_IPN = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
 
     private const LIVE_IPN = 'https://ipnpb.paypal.com/cgi-bin/webscr';
@@ -38,6 +35,29 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
             return false;
         }
 
+        return $this->verifyIpn();
+    }
+
+    public function isRedirect()
+    {
+        return $this->isPending();
+    }
+
+    public function isPending()
+    {
+        if (
+            !empty($this->data)
+            && !empty($this->data['payment_status'])
+            && 'Pending' === $this->data['payment_status']
+        ) {
+            return true;
+        }
+
+        return parent::isPending();
+    }
+
+    private function verifyIpn()
+    {
         $raw_post_data = file_get_contents('php://input');
         $raw_post_array = explode('&', $raw_post_data);
         $myPost = [];
@@ -107,7 +127,7 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
         if (
             empty($this->data)
             || empty($this->data['payment_status'])
-            || 'Completed' !== $this->data['payment_status']
+            || !in_array($this->data['payment_status'], ['Completed', 'Pending'])
             || !count($_POST)
         ) {
             return true;
