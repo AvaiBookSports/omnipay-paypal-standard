@@ -4,11 +4,24 @@ declare(strict_types=1);
 
 namespace Omnipay\PayPalStandard\Message;
 
+use Omnipay\Common\Message\RequestInterface;
+
 abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
 {
     private const SANDBOX_IPN = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
 
     private const LIVE_IPN = 'https://ipnpb.paypal.com/cgi-bin/webscr';
+
+    private ?string $paymentStatus = null;
+
+    public function __construct(RequestInterface $request, $data)
+    {
+        parent::__construct($request, $data);
+
+        if (!empty($this->data['payment_status'])) {
+            $this->paymentStatus = (string) $this->data['payment_status'];
+        }
+    }
 
     protected function isTestMode(): bool
     {
@@ -26,12 +39,7 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
 
     public function isSuccessful()
     {
-        if (
-            empty($this->data)
-            || empty($this->data['payment_status'])
-            || 'Completed' !== $this->data['payment_status']
-            || !count($_POST)
-        ) {
+        if ('Completed' !== $this->paymentStatus || !count($_POST)) {
             return false;
         }
 
@@ -40,16 +48,12 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
 
     public function isRedirect()
     {
-        return $this->isPending();
+        return $this->isPending() || (!$this->isSuccessful() && 'Completed' === $this->paymentStatus);
     }
 
     public function isPending()
     {
-        if (
-            !empty($this->data)
-            && !empty($this->data['payment_status'])
-            && 'Pending' === $this->data['payment_status']
-        ) {
+        if ('Pending' === $this->paymentStatus) {
             return true;
         }
 
@@ -124,12 +128,7 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
 
     public function isCancelled()
     {
-        if (
-            empty($this->data)
-            || empty($this->data['payment_status'])
-            || !in_array($this->data['payment_status'], ['Completed', 'Pending'])
-            || !count($_POST)
-        ) {
+        if (!in_array($this->paymentStatus, ['Completed', 'Pending']) || !count($_POST)) {
             return true;
         }
 
