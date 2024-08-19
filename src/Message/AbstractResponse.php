@@ -67,21 +67,29 @@ abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
         $myPost = [];
         foreach ($raw_post_array as $keyval) {
             $keyval = explode('=', $keyval);
-            if (!empty($keyval) && 2 == count($keyval)) {
+            if (count($keyval) == 2) {
                 // Since we do not want the plus in the datetime string to be encoded to a space, we manually encode it.
-                if ('payment_date' === $keyval[0]) {
-                    if (1 === substr_count($keyval[1], '+')) {
+                if ($keyval[0] === 'payment_date') {
+                    if (substr_count($keyval[1], '+') === 1) {
                         $keyval[1] = str_replace('+', '%2B', $keyval[1]);
                     }
                 }
-                $myPost[$keyval[0]] = rawurldecode($keyval[1]);
+                $myPost[$keyval[0]] = urldecode($keyval[1]);
             }
         }
+
         // Build the body of the verification post request, adding the _notify-validate command.
         $req = 'cmd=_notify-validate';
-
+        $get_magic_quotes_exists = false;
+        if (function_exists('get_magic_quotes_gpc')) {
+            $get_magic_quotes_exists = true;
+        }
         foreach ($myPost as $key => $value) {
-            $value = rawurlencode($value);
+            if ($get_magic_quotes_exists == true && get_magic_quotes_gpc() == 1) {
+                $value = urlencode(stripslashes($value));
+            } else {
+                $value = urlencode($value);
+            }
             $req .= "&$key=$value";
         }
 
