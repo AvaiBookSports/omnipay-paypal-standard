@@ -2,10 +2,6 @@
 
 namespace Omnipay\PayPalStandard\Message;
 
-/**
- * Authorize Request
- * CompletePurchaseRequest.php - processes the IPN
- */
 class CompletePurchaseRequest extends AbstractRequest
 {
     public function sendData($data)

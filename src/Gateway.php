@@ -26,26 +26,6 @@ class Gateway extends AbstractGateway
     /**
      *
      * @param array $parameters
-     * @return Message\AuthorizeRequest
-     */
-    public function authorize(array $parameters = array())
-    {
-        return $this->createRequest(Message\AuthorizeRequest::class, $parameters);
-    }
-
-    /**
-     *
-     * @param array $parameters
-     * @return Message\CaptureRequest
-     */
-    public function capture(array $parameters = array())
-    {
-        return $this->createRequest(Message\CaptureRequest::class, $parameters);
-    }
-
-    /**
-     *
-     * @param array $parameters
      * @return Message\PurchaseRequest
      */
     public function purchase(array $parameters = array())
@@ -63,14 +43,6 @@ class Gateway extends AbstractGateway
         return $this->createRequest(Message\CompletePurchaseRequest::class, $parameters);
     }
 
-    /**
-     * @param array $parameters
-     * @return Message\CompleteAuthorizeRequest
-     */
-    public function completeAuthorize(array $parameters = array())
-    {
-        return $this->createRequest(Message\CompleteAuthorizeRequest::class, $parameters);
-    }
 
     public function getBusiness()
     {
