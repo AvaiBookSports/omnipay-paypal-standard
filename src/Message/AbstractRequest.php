@@ -34,6 +34,10 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             'lc' => $this->getLc(),
             'custom' => $this->getCustom(),
             'cbt' => $this->getCbt(),
+            'notify_url' => $this->getNotifyUrl(),
+            'return' => $this->getReturn(),
+            'cancel_return' => $this->getCancelReturn(),
+            'business' => $this->getBusiness(),
         ];
     }
 

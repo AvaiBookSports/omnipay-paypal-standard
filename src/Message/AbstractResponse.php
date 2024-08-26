@@ -1,150 +1,46 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Omnipay\PayPalStandard\Message;
 
+use Omnipay\Common\Message\AbstractResponse as OmnipayAbstractResponse;
 use Omnipay\Common\Message\RequestInterface;
+use Omnipay\Common\Message\RedirectResponseInterface;
 
-abstract class AbstractResponse extends \Omnipay\Common\Message\AbstractResponse
+/**
+ * Response
+ */
+abstract class AbstractResponse extends OmnipayAbstractResponse implements RedirectResponseInterface
 {
-    private const SANDBOX_IPN = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
+    protected const TEST_ENDPOINT = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 
-    private const LIVE_IPN = 'https://ipnpb.paypal.com/cgi-bin/webscr';
+    protected const LIVE_ENDPOINT = 'https://www.paypal.com/cgi-bin/webscr';
 
-    private ?string $paymentStatus = null;
+    public function getEndpoint(): string
+    {
+        return $this->getRequest()->getTestMode() ? self::TEST_ENDPOINT : self::LIVE_ENDPOINT;
+    }
 
     public function __construct(RequestInterface $request, $data)
     {
         parent::__construct($request, $data);
-
-        if (!empty($this->data['payment_status'])) {
-            $this->paymentStatus = (string) $this->data['payment_status'];
-        }
     }
 
-    protected function isTestMode(): bool
+    public function getRedirectUrl()
     {
-        return $this->request->getParameters()['testMode'];
+        return $this->getEndpoint() . '?' . http_build_query($this->data);
     }
 
-    protected function getIpnUrl(): string
+    /**
+     * Should the browser redirect using GET or POST
+     * @return string
+     */
+    public function getRedirectMethod()
     {
-        if ($this->isTestMode()) {
-            return self::SANDBOX_IPN;
-        }
-
-        return self::LIVE_IPN;
+        return 'GET';
     }
 
-    public function isSuccessful()
+    public function getRedirectData()
     {
-        if ('Completed' !== $this->paymentStatus || !count($_POST)) {
-            return false;
-        }
-
-        return $this->verifyIpn();
-    }
-
-    public function isRedirect()
-    {
-        return $this->isPending() || (!$this->isSuccessful() && 'Completed' === $this->paymentStatus);
-    }
-
-    public function isPending()
-    {
-        if ('Pending' === $this->paymentStatus) {
-            return true;
-        }
-
-        return parent::isPending();
-    }
-
-    private function verifyIpn()
-    {
-        $raw_post_data = file_get_contents('php://input');
-        $raw_post_array = explode('&', $raw_post_data);
-        $myPost = [];
-        foreach ($raw_post_array as $keyval) {
-            $keyval = explode('=', $keyval);
-            if (count($keyval) == 2) {
-                // Since we do not want the plus in the datetime string to be encoded to a space, we manually encode it.
-                if ($keyval[0] === 'payment_date') {
-                    if (substr_count($keyval[1], '+') === 1) {
-                        $keyval[1] = str_replace('+', '%2B', $keyval[1]);
-                    }
-                }
-                $myPost[$keyval[0]] = urldecode($keyval[1]);
-            }
-        }
-
-        // Build the body of the verification post request, adding the _notify-validate command.
-        $req = 'cmd=_notify-validate';
-        $get_magic_quotes_exists = false;
-        if (function_exists('get_magic_quotes_gpc')) {
-            $get_magic_quotes_exists = true;
-        }
-        foreach ($myPost as $key => $value) {
-            if ($get_magic_quotes_exists == true && get_magic_quotes_gpc() == 1) {
-                $value = urlencode(stripslashes($value));
-            } else {
-                $value = urlencode($value);
-            }
-            $req .= "&$key=$value";
-        }
-
-        $ch = curl_init($this->getIpnUrl());
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $req);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 6);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'User-Agent: PHP-IPN-Verification-Script',
-            'Connection: Close',
-        ]);
-
-        $res = curl_exec($ch);
-
-        if (!$res) {
-            $errno = curl_errno($ch);
-            $errstr = curl_error($ch);
-            curl_close($ch);
-            throw new Exception("cURL error: [$errno] $errstr");
-        }
-
-        $info = curl_getinfo($ch);
-        $http_code = $info['http_code'];
-
-        if (200 != $http_code) {
-            throw new Exception("PayPal responded with http code $http_code");
-        }
-
-        curl_close($ch);
-
-        // Check if PayPal verifies the IPN data, and if so, return true.
-        if ($res == 'VERIFIED') {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function isCancelled()
-    {
-        if (!in_array($this->paymentStatus, ['Completed', 'Pending']) || !count($_POST)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function getTransactionReference()
-    {
-        return $this->data['payer_id'];
+        return $this->getData();
     }
 }
